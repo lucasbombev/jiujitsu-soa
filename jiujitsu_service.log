@@ -1,0 +1,70 @@
+2026-06-07 15:09:17,592 [INFO] [app.py:35] - Inicializando banco de dados SQLite...
+2026-06-07 15:09:17,601 [INFO] [app.py:65] - Populando cursos padrão no banco de dados...
+2026-06-07 15:09:17,604 [INFO] [app.py:76] - Banco de dados SQLite inicializado com sucesso.
+2026-06-07 15:09:17,604 [INFO] [app.py:340] - Iniciando servidor SOAP Gestor de Matrículas em http://127.0.0.1:8000/
+2026-06-07 15:09:20,640 [INFO] [app.py:256] - [consultar_cursos] Consulta pública de cursos para Categoria='None'
+2026-06-07 15:09:20,641 [INFO] [app.py:273] - [consultar_cursos] Retornados 3 cursos cadastrados.
+2026-06-07 15:09:20,646 [INFO] [app.py:80] - [registrar_matricula] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,646 [WARNING] [app.py:96] - [registrar_matricula] Falha na autenticação: <wsse:Security> ausente no documento.
+2026-06-07 15:09:20,646 [ERROR] [application.py:210] - Fault(Client.Security: 'Security header is missing. SOAP requests to protected operations must contain a <wsse:Security> header.')
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\application.py", line 173, in process_request
+    ctx.out_object = self.call_wrapper(ctx)
+                     ~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\application.py", line 242, in call_wrapper
+    return ctx.descriptor.service_class.call_wrapper(ctx)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\service.py", line 194, in call_wrapper
+    return ctx.function(*args)
+           ~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\app.py", line 155, in registrar_matricula
+    check_security(ctx)
+    ~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\app.py", line 97, in check_security
+    raise Fault(
+    ...<2 lines>...
+    )
+spyne.model.fault.Fault: Fault(Client.Security: 'Security header is missing. SOAP requests to protected operations must contain a <wsse:Security> header.')
+2026-06-07 15:09:20,650 [INFO] [app.py:80] - [registrar_matricula] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,651 [WARNING] [app.py:129] - [registrar_matricula] Falha na autenticação: Credenciais inválidas para o usuário 'admin'.
+2026-06-07 15:09:20,651 [ERROR] [application.py:210] - Fault(Client.Security: 'Authentication failed: Invalid username or password.')
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\application.py", line 173, in process_request
+    ctx.out_object = self.call_wrapper(ctx)
+                     ~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\application.py", line 242, in call_wrapper
+    return ctx.descriptor.service_class.call_wrapper(ctx)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\venv\Lib\site-packages\spyne\service.py", line 194, in call_wrapper
+    return ctx.function(*args)
+           ~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\app.py", line 155, in registrar_matricula
+    check_security(ctx)
+    ~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Documents\jiujitsu-soa\app.py", line 130, in check_security
+    raise Fault(
+    ...<2 lines>...
+    )
+spyne.model.fault.Fault: Fault(Client.Security: 'Authentication failed: Invalid username or password.')
+2026-06-07 15:09:20,655 [INFO] [app.py:80] - [registrar_matricula] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,655 [INFO] [app.py:126] - [registrar_matricula] Autenticação bem-sucedida para o usuário: admin
+2026-06-07 15:09:20,655 [INFO] [app.py:161] - [registrar_matricula] Tentativa de registrar matrícula: Aluno='Rickson Gracie', CPF='222.***.***-55', CursoID=2, Plano='SEMESTRAL'
+2026-06-07 15:09:20,659 [INFO] [app.py:179] - [registrar_matricula] Sucesso! Matrícula registrada com ID=1
+2026-06-07 15:09:20,662 [INFO] [app.py:192] - [consultar_matricula] Consulta pública para matrícula ID=1
+2026-06-07 15:09:20,664 [INFO] [app.py:211] - [consultar_matricula] Sucesso! Matricula encontrada para aluno 'Rickson Gracie'
+2026-06-07 15:09:20,667 [INFO] [app.py:80] - [listar_matriculas_ativas] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,667 [INFO] [app.py:126] - [listar_matriculas_ativas] Autenticação bem-sucedida para o usuário: admin
+2026-06-07 15:09:20,667 [INFO] [app.py:225] - [listar_matriculas_ativas] Listando matrículas com status='Ativo'
+2026-06-07 15:09:20,668 [INFO] [app.py:245] - [listar_matriculas_ativas] Sucesso! Retornando 1 matrículas ativas.
+2026-06-07 15:09:20,671 [INFO] [app.py:80] - [atualizar_status_matricula] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,671 [INFO] [app.py:126] - [atualizar_status_matricula] Autenticação bem-sucedida para o usuário: admin
+2026-06-07 15:09:20,671 [INFO] [app.py:284] - [atualizar_status_matricula] Atualizando matricula ID=1 para Status='Inativo'
+2026-06-07 15:09:20,676 [INFO] [app.py:298] - [atualizar_status_matricula] Sucesso! Matricula ID=1 atualizada.
+2026-06-07 15:09:20,678 [INFO] [app.py:192] - [consultar_matricula] Consulta pública para matrícula ID=1
+2026-06-07 15:09:20,680 [INFO] [app.py:211] - [consultar_matricula] Sucesso! Matricula encontrada para aluno 'Rickson Gracie'
+2026-06-07 15:09:20,683 [INFO] [app.py:80] - [deletar_matricula] Iniciando validação de segurança SOAP Header
+2026-06-07 15:09:20,683 [INFO] [app.py:126] - [deletar_matricula] Autenticação bem-sucedida para o usuário: admin
+2026-06-07 15:09:20,684 [INFO] [app.py:311] - [deletar_matricula] Deletando matricula ID=1
+2026-06-07 15:09:20,688 [INFO] [app.py:320] - [deletar_matricula] Sucesso! Matricula ID=1 deletada.
+2026-06-07 15:09:20,692 [INFO] [app.py:192] - [consultar_matricula] Consulta pública para matrícula ID=1
+2026-06-07 15:09:20,693 [WARNING] [app.py:214] - [consultar_matricula] Matrícula ID=1 não encontrada.

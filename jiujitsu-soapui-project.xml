@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="9e8fdf0b-2ba7-4e0a-b286-9a29d5b41295" activeEnvironment="Default" name="Jiu-Jitsu School SOAP Service" resourceRoot="" soapui-version="5.10.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" id="70559f0f-8700-4b68-8090-de5258e705b7" name="Application" type="wsdl" bindingName="{jiujitsu.escola.services}Application" soapVersion="1_1" anonymous="optional" definition="http://127.0.0.1:8000/?wsdl" wsaVersion="NONE" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:definitionCache type="TEXT" rootPart="http://127.0.0.1:8000/?wsdl">
+      <con:part>
+        <con:url>http://127.0.0.1:8000/?wsdl</con:url>
+        <con:content>
+        &lt;!-- WSDL definition is referenced online at http://127.0.0.1:8000/?wsdl -->
+        </con:content>
+      </con:part>
+    </con:definitionCache>
+    
+    <!-- OPERATION: consultar_cursos (Public) -->
+    <con:endpoints/><con:operation id="101" name="consultar_cursos" isOneWay="false" action="consultar_cursos" bindingOperationName="consultar_cursos" type="Request-Response" inputName="consultar_cursos" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c101" name="Request 1 - Todos os Cursos (Público)">
+        <con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:consultar_cursos>
+         <jiu:categoria></jiu:categoria>
+      </jiu:consultar_cursos>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="consultar_cursos"/>
+      <con:wsrmConfig version="1.2"/></con:call>
+      <con:call id="c102" name="Request 2 - Filtrar por Basico (Público)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:consultar_cursos>
+         <jiu:categoria>Basico</jiu:categoria>
+      </jiu:consultar_cursos>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+    </con:operation>
+
+    <!-- OPERATION: registrar_matricula (Protected) -->
+    <con:operation id="102" name="registrar_matricula" isOneWay="false" action="registrar_matricula" bindingOperationName="registrar_matricula" type="Request-Response" inputName="registrar_matricula" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c103" name="Request 1 - Sem Autenticação (Falha Esperada)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:registrar_matricula>
+         <jiu:nome_aluno>Rickson Gracie</jiu:nome_aluno>
+         <jiu:cpf>222.333.444-55</jiu:cpf>
+         <jiu:id_curso>2</jiu:id_curso>
+         <jiu:plano>SEMESTRAL</jiu:plano>
+      </jiu:registrar_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+      <con:call id="c104" name="Request 2 - Autenticado Sucesso">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <soapenv:Header>
+      <wsse:Security>
+         <wsse:UsernameToken>
+            <wsse:Username>admin</wsse:Username>
+            <wsse:Password>senha_jiujitsu_123</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <jiu:registrar_matricula>
+         <jiu:nome_aluno>Rickson Gracie</jiu:nome_aluno>
+         <jiu:cpf>222.333.444-55</jiu:cpf>
+         <jiu:id_curso>2</jiu:id_curso>
+         <jiu:plano>SEMESTRAL</jiu:plano>
+      </jiu:registrar_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+    </con:operation>
+
+    <!-- OPERATION: consultar_matricula (Public) -->
+    <con:operation id="103" name="consultar_matricula" isOneWay="false" action="consultar_matricula" bindingOperationName="consultar_matricula" type="Request-Response" inputName="consultar_matricula" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c105" name="Request 1 - Consultar ID 1 (Público)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:consultar_matricula>
+         <jiu:id_matricula>1</jiu:id_matricula>
+      </jiu:consultar_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+    </con:operation>
+
+    <!-- OPERATION: listar_matriculas_ativas (Protected) -->
+    <con:operation id="104" name="listar_matriculas_ativas" isOneWay="false" action="listar_matriculas_ativas" bindingOperationName="listar_matriculas_ativas" type="Request-Response" inputName="listar_matriculas_ativas" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c106" name="Request 1 - Sem Autenticação (Falha Esperada)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:listar_matriculas_ativas/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+      <con:call id="c107" name="Request 2 - Autenticado Sucesso">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <soapenv:Header>
+      <wsse:Security>
+         <wsse:UsernameToken>
+            <wsse:Username>admin</wsse:Username>
+            <wsse:Password>senha_jiujitsu_123</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <jiu:listar_matriculas_ativas/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+    </con:operation>
+
+    <!-- OPERATION: atualizar_status_matricula (Protected) -->
+    <con:operation id="105" name="atualizar_status_matricula" isOneWay="false" action="atualizar_status_matricula" bindingOperationName="atualizar_status_matricula" type="Request-Response" inputName="atualizar_status_matricula" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c108" name="Request 1 - Sem Autenticação (Falha Esperada)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:atualizar_status_matricula>
+         <jiu:id_matricula>1</jiu:id_matricula>
+         <jiu:status>Inativo</jiu:status>
+      </jiu:atualizar_status_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+      <con:call id="c109" name="Request 2 - Autenticado Sucesso">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <soapenv:Header>
+      <wsse:Security>
+         <wsse:UsernameToken>
+            <wsse:Username>admin</wsse:Username>
+            <wsse:Password>senha_jiujitsu_123</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <jiu:atualizar_status_matricula>
+         <jiu:id_matricula>1</jiu:id_matricula>
+         <jiu:status>Inativo</jiu:status>
+      </jiu:atualizar_status_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      <con:wsrmConfig version="1.2"/></con:call>
+    </con:operation>
+
+    <!-- OPERATION: deletar_matricula (Protected) -->
+    <con:operation id="106" name="deletar_matricula" isOneWay="false" action="deletar_matricula" bindingOperationName="deletar_matricula" type="Request-Response" inputName="deletar_matricula" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="c110" name="Request 1 - Sem Autenticação (Falha Esperada)">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <jiu:deletar_matricula>
+         <jiu:id_matricula>1</jiu:id_matricula>
+      </jiu:deletar_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+      <con:call id="c111" name="Request 2 - Autenticado Sucesso">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://127.0.0.1:8000/</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:jiu="jiujitsu.escola.services" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <soapenv:Header>
+      <wsse:Security>
+         <wsse:UsernameToken>
+            <wsse:Username>admin</wsse:Username>
+            <wsse:Password>senha_jiujitsu_123</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <jiu:deletar_matricula>
+         <jiu:id_matricula>1</jiu:id_matricula>
+      </jiu:deletar_matricula>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:wsaConfig mustUnderstand="NONE" version="200508"/>
+      </con:call>
+    </con:operation>
+
+  </con:interface>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+</con:soapui-project>
