@@ -1,0 +1,57 @@
+# ==============================================================================
+# DOCKER-COMPOSE - AMBIENTE COMPLETO DE CLOUD (WEB APP + POSTGRESQL)
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # Serviço da Aplicação Web (FastAPI + Front-end SPA)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jiujitsu-cloud-web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - APP_ENV=production
+      - DATABASE_URL=postgresql://jiuuser:jiupassword@db:5432/jiudb
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=senha_jiujitsu_123
+      - SECRET_KEY=jiujitsu-cloud-secret-compose-token
+      - CORS_ORIGINS=*
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Serviço de Banco de Dados Relacional (PostgreSQL emulado para nuvem)
+  db:
+    image: postgres:15-alpine
+    container_name: jiujitsu-cloud-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jiuuser
+      POSTGRES_PASSWORD: jiupassword
+      POSTGRES_DB: jiudb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jiuuser -d jiudb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local

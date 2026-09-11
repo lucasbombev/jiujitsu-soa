@@ -1,3 +1,15 @@
+# Jiu-Jitsu Cloud Web Application & SOA Core
+# Dependências do Back-end REST e Front-end (Nuvem)
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+python-dotenv>=1.0.0
+pytest>=8.0.0
+httpx>=0.27.0
+
+# Dependências do Serviço SOA Legado (SOAP 1.1)
 https://github.com/arskom/spyne/archive/master.zip
-werkzeug
-lxml
+werkzeug>=3.0.0
+lxml>=5.0.0

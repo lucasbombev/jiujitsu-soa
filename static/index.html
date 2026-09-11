@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jiu-Jitsu Academy - Gestão Cloud & SOA</title>
+  <meta name="description" content="Sistema de Gestão de Academia de Jiu-Jitsu desenvolvido para a disciplina Aplicação Web para Nuvem. Arquitetura híbrida SOA e Cloud-Native RESTful.">
+  
+  <!-- Fontes Google Modernas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Barra Superior de Navegação -->
+  <header class="navbar" id="main-navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <span class="brand-icon">🥋</span>
+        <div class="brand-text">
+          <span class="brand-title">OSS! Jiu-Jitsu</span>
+          <span class="brand-subtitle">Cloud Academy Management</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#dashboard-section" class="nav-link active" id="nav-dashboard">Dashboard</a>
+        <a href="#cursos-section" class="nav-link" id="nav-cursos">Cursos</a>
+        <a href="#matriculas-section" class="nav-link" id="nav-matriculas">Matrículas</a>
+        <button class="nav-link btn-ghost" id="btn-open-arch-modal">Arquitetura Cloud</button>
+        <a href="/docs" target="_blank" class="nav-link nav-badge-link" id="nav-swagger">
+          Swagger API <span class="badge-mini">OpenAPI</span>
+        </a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="cloud-status" id="cloud-status-badge">
+          <span class="status-dot pulsing"></span>
+          <span id="cloud-status-text">Conectando...</span>
+        </div>
+        <button class="btn btn-secondary" id="btn-admin-auth">
+          <span id="admin-auth-label">Entrar (Admin)</span>
+        </button>
+        <button class="btn btn-primary" id="btn-open-matricula-modal">
+          + Nova Matrícula
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Informativo de Nuvem e Disciplina -->
+  <div class="academic-banner">
+    <div class="banner-content">
+      <span class="banner-tag">Disciplina: Aplicação Web para Nuvem</span>
+      <span class="banner-text">Arquitetura Híbrida: <strong>SOA Legado (SOAP 1.1)</strong> integrado com <strong>Cloud RESTful (FastAPI + SPA)</strong> em <strong>IaaS & PaaS</strong></span>
+      <div class="banner-links">
+        <a href="/health" target="_blank" class="banner-link" id="link-healthcheck">Health Check</a>
+        <span class="separator">•</span>
+        <a href="/api/architecture/info" target="_blank" class="banner-link" id="link-arch-info">Metadados Arquiteturais</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-container">
+
+    <!-- Seção de Métricas / KPIs -->
+    <section class="section" id="dashboard-section">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Painel de Controle Cloud</h1>
+          <p class="section-subtitle">Métricas em tempo real consumidas via REST API com persistência relacional</p>
+        </div>
+        <button class="btn btn-icon" id="btn-refresh-stats" title="Recarregar Dados">
+          🔄 Atualizar
+        </button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" id="card-total-alunos">
+          <div class="kpi-icon icon-students">👥</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total de Matrículas</span>
+            <span class="kpi-value" id="kpi-total-matriculas">--</span>
+            <span class="kpi-subtext" id="kpi-subtext-retencao">Taxa de Atividade: --%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="card-alunos-ativos">
+          <div class="kpi-icon icon-active">⚡</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Matrículas Ativas</span>
+            <span class="kpi-value highlight-emerald" id="kpi-matriculas-ativas">--</span>
+            <span class="kpi-subtext">No tatame atualmente</span>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="card-cursos">
+          <div class="kpi-icon icon-courses">🥋</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Cursos Ofertados</span>
+            <span class="kpi-value highlight-amber" id="kpi-total-cursos">--</span>
+            <span class="kpi-subtext">Categorias ativas</span>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="card-faturamento">
+          <div class="kpi-icon icon-revenue">💰</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Faturamento Estimado</span>
+            <span class="kpi-value highlight-gold" id="kpi-faturamento">R$ 0,00</span>
+            <span class="kpi-subtext">Recorrência mensal ativa</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Cursos Disponíveis -->
+    <section class="section" id="cursos-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Cursos Disponíveis</h2>
+          <p class="section-subtitle">Categorias e planos ofertados pela academia</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-outline" id="btn-open-curso-modal">+ Novo Curso</button>
+        </div>
+      </div>
+
+      <div class="courses-grid" id="courses-grid">
+        <!-- Renderizado dinamicamente via JS -->
+        <div class="loading-state">Carregando catálogo de cursos...</div>
+      </div>
+    </section>
+
+    <!-- Seção de Matrículas (Tabela Interativa) -->
+    <section class="section" id="matriculas-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Gestão de Alunos e Matrículas</h2>
+          <p class="section-subtitle">Listagem de alunos cadastrados, controle de planos e status</p>
+        </div>
+        <div class="table-controls">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="Buscar por nome ou CPF..." autocomplete="off">
+          </div>
+          <div class="filter-box">
+            <select id="filter-status" aria-label="Filtrar por status">
+              <option value="">Todos os Status</option>
+              <option value="Ativo">Apenas Ativos</option>
+              <option value="Inativo">Inativos</option>
+              <option value="Cancelado">Cancelados</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table" id="matriculas-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Aluno</th>
+              <th>CPF (LGPD)</th>
+              <th>Curso</th>
+              <th>Plano</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="matriculas-tbody">
+            <!-- Linhas renderizadas via JS -->
+            <tr>
+              <td colspan="7" class="loading-state">Carregando matrículas...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>Jiu-Jitsu Cloud Web App</strong> • Aplicação Web para Nuvem
+        <p>Arquitetura desenvolvida para ambientes IaaS (AWS EC2) e PaaS (Render, Railway, Vercel).</p>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/lucasbombev/jiujitsu-soa" target="_blank" class="footer-link">Repositório GitHub</a>
+        <span class="separator">•</span>
+        <a href="/health" target="_blank" class="footer-link">Liveness Probe</a>
+        <span class="separator">•</span>
+        <a href="/docs" target="_blank" class="footer-link">Documentação OpenAPI</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAIS INTERATIVOS                                                        -->
+  <!-- ========================================================================= -->
+
+  <!-- Modal Nova Matrícula -->
+  <div class="modal-overlay" id="modal-matricula" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Nova Matrícula de Aluno</h3>
+        <button class="btn-close" id="btn-close-matricula-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-nova-matricula">
+        <div class="form-group">
+          <label for="mat-nome">Nome Completo do Aluno</label>
+          <input type="text" id="mat-nome" required placeholder="Ex: Rickson Gracie" minlength="3">
+        </div>
+
+        <div class="form-group">
+          <label for="mat-cpf">CPF</label>
+          <input type="text" id="mat-cpf" required placeholder="000.000.000-00" maxlength="14">
+          <small class="form-help">Os dados são protegidos e mascarados nos logs conforme a LGPD.</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mat-curso">Curso Selecionado</label>
+            <select id="mat-curso" required>
+              <option value="">Selecione um curso...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="mat-plano">Plano de Pagamento</label>
+            <select id="mat-plano" required>
+              <option value="Mensal">Mensal</option>
+              <option value="Semestral">Semestral (10% desc.)</option>
+              <option value="Anual">Anual (20% desc.)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-matricula">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-matricula">Confirmar Matrícula</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Novo Curso -->
+  <div class="modal-overlay" id="modal-curso" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Cadastrar Novo Curso</h3>
+        <button class="btn-close" id="btn-close-curso-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-novo-curso">
+        <div class="form-group">
+          <label for="curso-nome">Nome do Curso</label>
+          <input type="text" id="curso-nome" required placeholder="Ex: Defesa Pessoal Urbana">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="curso-categoria">Categoria</label>
+            <select id="curso-categoria" required>
+              <option value="Básico">Básico</option>
+              <option value="Avançado">Avançado</option>
+              <option value="Infantil">Infantil</option>
+              <option value="Master">Master</option>
+              <option value="Competição">Competição</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="curso-valor">Mensalidade (R$)</label>
+            <input type="number" id="curso-valor" step="0.01" min="10" required placeholder="180.00">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-curso">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-curso">Cadastrar Curso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Login / Autenticação Admin -->
+  <div class="modal-overlay" id="modal-admin" aria-hidden="true">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Autenticação Administrativa</h3>
+        <button class="btn-close" id="btn-close-admin-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-admin-login">
+        <p class="modal-desc">Faça login com as credenciais administrativas para cadastrar novos cursos e gerenciar o sistema.</p>
+        <div class="form-group">
+          <label for="admin-user">Usuário</label>
+          <input type="text" id="admin-user" required value="admin">
+        </div>
+        <div class="form-group">
+          <label for="admin-pass">Senha</label>
+          <input type="password" id="admin-pass" required value="senha_jiujitsu_123">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-admin">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-admin">Autenticar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Educativo: Arquitetura SOA ➡️ Cloud -->
+  <div class="modal-overlay" id="modal-arch" aria-hidden="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">🏛️ Evolução Arquitetural: SOA para Nuvem</h3>
+        <button class="btn-close" id="btn-close-arch-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body-scroll">
+        <div class="arch-comparison-grid">
+          <div class="arch-col legacy-col">
+            <h4>Pilar 1: Aplicação Original (SOA Clássico)</h4>
+            <ul>
+              <li><strong>Protocolo:</strong> SOAP 1.1 sobre HTTP (XML RPC).</li>
+              <li><strong>Contrato:</strong> WSDL e XSD formais (`jiujitsu.escola.services`).</li>
+              <li><strong>Segurança:</strong> WS-Security UsernameToken no header XML.</li>
+              <li><strong>Servidor:</strong> `wsgiref.simple_server` (single-thread local).</li>
+              <li><strong>Consumidor:</strong> SoapUI e script de teste `zeep`.</li>
+            </ul>
+          </div>
+          <div class="arch-col modern-col">
+            <h4>Pilar 2: Evolução para Nuvem (Cloud-Native)</h4>
+            <ul>
+              <li><strong>Protocolo:</strong> RESTful JSON sobre HTTP assíncrono.</li>
+              <li><strong>Especificação:</strong> OpenAPI 3.0 / Swagger UI interativo.</li>
+              <li><strong>Front-end:</strong> SPA responsiva com Vanilla JS e CSS moderno.</li>
+              <li><strong>Persistência:</strong> Agnóstica via SQLAlchemy (SQLite / PostgreSQL).</li>
+              <li><strong>12-Factor App:</strong> Config via `.env`, logs em stdout, healthcheck `/health`.</li>
+              <li><strong>Deploys:</strong> IaaS em AWS EC2 e PaaS em Render/Railway.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="arch-cloud-summary">
+          <h4>Ambientes de Implantação da Disciplina</h4>
+          <div class="deploy-badges">
+            <span class="deploy-badge iaas">🖥️ IaaS: AWS EC2 (Ubuntu + Nginx + Systemd + Uvicorn)</span>
+            <span class="deploy-badge paas">🚀 PaaS: Render / Railway (Deploy Git automatizado + PostgreSQL)</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="btn-ok-arch">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de Toasts de Notificação -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Script da Aplicação -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
