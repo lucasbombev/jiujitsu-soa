@@ -12,6 +12,14 @@ const State = {
   health: null
 };
 
+// Utilitários puros compartilhados (static/utils.js) e testados no Vitest.
+const {
+  escapeHtml,
+  formatCurrency,
+  filterMatriculas,
+  buildMatriculaRow
+} = window.JJUtils;
+
 // ==============================================================================
 // INICIALIZAÇÃO
 // ==============================================================================
@@ -137,10 +145,7 @@ async function fetchStats() {
     document.getElementById("kpi-subtext-retencao").innerText = `Taxa de Atividade: ${stats.taxa_retencao}%`;
 
     // Formatar moeda BRL
-    const faturamentoFormatado = new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    }).format(stats.faturamento_mensal_estimado || 0);
+    const faturamentoFormatado = formatCurrency(stats.faturamento_mensal_estimado || 0);
 
     document.getElementById("kpi-faturamento").innerText = faturamentoFormatado;
   } catch (err) {
@@ -234,16 +239,11 @@ function renderMatriculasTable() {
   const tbody = document.getElementById("matriculas-tbody");
   if (!tbody) return;
 
-  const termoBusca = (document.getElementById("search-input")?.value || "").toLowerCase().trim();
+  const termoBusca = document.getElementById("search-input")?.value || "";
   const statusFiltro = document.getElementById("filter-status")?.value || "";
 
-  // Filtragem local instantânea
-  const filtradas = State.matriculas.filter(m => {
-    const bateNome = m.nome_aluno.toLowerCase().includes(termoBusca);
-    const bateCpf = m.cpf.includes(termoBusca);
-    const bateStatus = !statusFiltro || m.status === statusFiltro;
-    return (bateNome || bateCpf) && bateStatus;
-  });
+  // Filtragem local instantânea (função pura testada em tests/frontend)
+  const filtradas = filterMatriculas(State.matriculas, termoBusca, statusFiltro);
 
   if (filtradas.length === 0) {
     tbody.innerHTML = `
@@ -254,44 +254,7 @@ function renderMatriculasTable() {
     return;
   }
 
-  tbody.innerHTML = filtradas.map(m => {
-    const statusClass = `status-${m.status.toLowerCase()}`;
-    const cpfFormatado = maskDisplayCpf(m.cpf);
-
-    return `
-      <tr id="row-matricula-${m.id}">
-        <td><strong>#${m.id}</strong></td>
-        <td><strong>${escapeHtml(m.nome_aluno)}</strong></td>
-        <td><code>${cpfFormatado}</code></td>
-        <td>${escapeHtml(m.curso_nome || "Curso #" + m.id_curso)}</td>
-        <td><span class="badge-mini">${escapeHtml(m.plano)}</span></td>
-        <td>
-          <span class="badge-status ${statusClass}">${m.status}</span>
-        </td>
-        <td>
-          <div class="action-btn-group">
-            ${m.status !== "Ativo" ? `
-              <button class="btn-table-action" onclick="alterarStatusMatricula(${m.id}, 'Ativo')" title="Ativar">
-                Ativar
-              </button>
-            ` : `
-              <button class="btn-table-action" onclick="alterarStatusMatricula(${m.id}, 'Inativo')" title="Inativar">
-                Inativar
-              </button>
-            `}
-            ${m.status !== "Cancelado" ? `
-              <button class="btn-table-action" onclick="alterarStatusMatricula(${m.id}, 'Cancelado')" title="Cancelar">
-                Cancelar
-              </button>
-            ` : ""}
-            <button class="btn-table-action btn-delete" onclick="deletarMatricula(${m.id})" title="Excluir Matrícula">
-              🗑️
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
+  tbody.innerHTML = filtradas.map(buildMatriculaRow).join("");
 }
 
 // ==============================================================================
@@ -496,14 +459,6 @@ function setupCpfMask() {
   });
 }
 
-function maskDisplayCpf(cpf) {
-  const digits = cpf.replace(/\D/g, "");
-  if (digits.length >= 11) {
-    return `${digits.slice(0, 3)}.***.***-${digits.slice(-2)}`;
-  }
-  return cpf;
-}
-
 function showToast(message, type = "info") {
   const container = document.getElementById("toast-container");
   if (!container) return;
@@ -519,14 +474,4 @@ function showToast(message, type = "info") {
     toast.style.transition = "all 0.3s ease";
     setTimeout(() => toast.remove(), 300);
   }, 4000);
-}
-
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }

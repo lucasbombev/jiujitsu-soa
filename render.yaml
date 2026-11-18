@@ -1,0 +1,54 @@
+# ==============================================================================
+# RENDER BLUEPRINT - Jiu-Jitsu Academy
+# ------------------------------------------------------------------------------
+# Este arquivo permite criar o serviço web no Render a partir do repositório:
+#   Dashboard do Render > New > Blueprint > selecionar o repositório.
+#
+# autoDeploy: false
+#   O Render NÃO faz deploy sozinho a cada push. Quem dispara o deploy é o job
+#   "deploy" do GitHub Actions, somente depois que os testes passam.
+#
+# Persistência:
+#   SQLite no disco efêmero do plano free. Os dados voltam ao seed inicial a
+#   cada deploy/restart. Para persistência real, troque DATABASE_URL por um
+#   PostgreSQL do Render (veja o GUIA.md).
+# ==============================================================================
+
+services:
+  - type: web
+    name: jiujitsu-academy
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: false
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+
+    envVars:
+      # Versão do Python usada no build (mesma do CI).
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+
+      - key: APP_ENV
+        value: production
+
+      # Banco SQLite local do container. Veja o aviso sobre efemeridade acima.
+      - key: DATABASE_URL
+        value: sqlite:///./jiujitsu.db
+
+      - key: ADMIN_USER
+        value: admin
+
+      # sync: false -> o Render pede o valor no momento da criação do Blueprint.
+      # Use uma senha forte; não versione a senha real no Git.
+      - key: ADMIN_PASSWORD
+        sync: false
+
+      # generateValue: true -> o Render gera uma chave secreta aleatória.
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: CORS_ORIGINS
+        value: "*"

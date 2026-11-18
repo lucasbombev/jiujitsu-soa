@@ -1,0 +1,154 @@
+# ==============================================================================
+# CI/CD - Jiu-Jitsu Academy
+# ------------------------------------------------------------------------------
+# Fluxo:
+#   1. backend-tests  -> instala Python + dependências e roda o Pytest.
+#   2. frontend-tests -> instala Node + dependências e roda o Vitest.
+#   3. deploy         -> só roda em push para a branch main e somente se os
+#                        dois jobs de teste passarem. Dispara o deploy hook do
+#                        Render e valida o /health da aplicação publicada.
+#
+# Secrets/variável necessários no GitHub (Settings > Secrets and variables >
+# Actions):
+#   - Secret   RENDER_DEPLOY_HOOK_URL : URL do Deploy Hook do serviço no Render.
+#   - Variable RENDER_APP_URL         : URL pública da aplicação (opcional;
+#                                       usada apenas para o health check).
+# ==============================================================================
+
+name: CI/CD - Testes e Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Permissão mínima: o workflow apenas lê o código do repositório.
+permissions:
+  contents: read
+
+# Se dois pushes chegarem juntos, cancela a execução antiga da mesma branch.
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # JOB 1 - Testes de backend (Pytest)
+  # ----------------------------------------------------------------------------
+  backend-tests:
+    name: Backend - Pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          # Cache das dependências pip baseado no requirements.txt.
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Executar testes de backend
+        run: pytest -v
+
+  # ----------------------------------------------------------------------------
+  # JOB 2 - Testes de frontend (Vitest + jsdom + Testing Library)
+  # ----------------------------------------------------------------------------
+  frontend-tests:
+    name: Frontend - Vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          # Cache do npm baseado no package-lock.json (npm ci exige o lock).
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Executar testes de frontend
+        run: npm test
+
+  # ----------------------------------------------------------------------------
+  # JOB 3 - Deploy no Render (somente push na main e após os testes passarem)
+  # ----------------------------------------------------------------------------
+  deploy:
+    name: Deploy no Render
+    needs: [backend-tests, frontend-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # O environment "production" permite acompanhar o deploy e a URL no GitHub.
+    environment:
+      name: production
+      # Se a variable não existir, aponta para o dashboard do Render.
+      url: ${{ vars.RENDER_APP_URL || 'https://dashboard.render.com' }}
+
+    steps:
+      - name: Disparar deploy hook do Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "${RENDER_DEPLOY_HOOK_URL}" ]; then
+            echo "::error title=Secret ausente::Cadastre o secret RENDER_DEPLOY_HOOK_URL em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          echo "Disparando deploy hook do Render..."
+          http_code=$(curl --silent --show-error --output /tmp/render-deploy.json \
+            --write-out "%{http_code}" --request POST "${RENDER_DEPLOY_HOOK_URL}" || true)
+          http_code="${http_code:-000}"
+
+          echo "Resposta HTTP do Render: ${http_code}"
+          if [ "${http_code}" -lt 200 ] || [ "${http_code}" -ge 300 ]; then
+            echo "::error title=Falha no deploy::O Render retornou HTTP ${http_code}."
+            cat /tmp/render-deploy.json || true
+            exit 1
+          fi
+          echo "Deploy solicitado com sucesso."
+
+      - name: Aguardar a aplicação ficar saudável
+        # Só executa se a variável RENDER_APP_URL estiver configurada.
+        if: vars.RENDER_APP_URL != ''
+        env:
+          RENDER_APP_URL: ${{ vars.RENDER_APP_URL }}
+        run: |
+          BASE_URL="${RENDER_APP_URL%/}"
+          echo "Aguardando ${BASE_URL}/health ..."
+
+          # Até 60 tentativas x 10s = 10 minutos para o Render concluir o build.
+          for attempt in $(seq 1 60); do
+            code=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+              --max-time 10 "${BASE_URL}/health" || true)
+
+            if [ "${code}" = "200" ]; then
+              echo "Aplicação saudável (HTTP 200) na tentativa ${attempt}."
+              exit 0
+            fi
+
+            echo "Tentativa ${attempt}/60 - status atual: ${code}"
+            sleep 10
+          done
+
+          echo "::error title=Health check falhou::A aplicação não respondeu HTTP 200 em ${BASE_URL}/health."
+          exit 1

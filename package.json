@@ -1,0 +1,20 @@
+{
+  "name": "jiujitsu-academy",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Testes de front-end (Vitest + jsdom + Testing Library) da Jiu-Jitsu Academy Cloud Web App",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "jsdom": "^27.0.1",
+    "vitest": "^4.0.18"
+  }
+}

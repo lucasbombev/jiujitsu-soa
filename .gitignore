@@ -29,6 +29,11 @@ jiujitsu_service.log
 .coverage
 htmlcov/
 
+# Node / Front-end
+node_modules/
+coverage/
+.vitest/
+
 # IDEs
 .vscode/
 .idea/
